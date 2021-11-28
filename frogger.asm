@@ -30,7 +30,7 @@
 	# positions
 	spawnPos: .word 61440
 	safeZonePos: .word 36864
-	row1LogPosX: .word 256
+	row1LogPosX: .word 512
 	row1LogPosY: .word 32768
 	
 	# run game if 1
@@ -123,11 +123,16 @@ DrawShortLogLoop:
 	addi $sp, $sp, -4 
 	lw $t0, row1LogPosX  # load the x position of the log into $t0
 	add $t0, $t0, $s0  # add the x offset to the x position
+	
+	blt $t0, 512, StoreFirstShortLogPixelPosition  # if the x position is greater than 512 due to the offset
+	addi $t0, $t0, -512  # subtract 512 from it, that is, $t0 = $t0 % 512
+StoreFirstShortLogPixelPosition:
 	lw $t1, row1LogPosY  # load the y position of the frog into $t1
 	# calculate the beginning pixel of the sprite
 	add $t1, $t1, $t0
-	la $t2, 0($gp)
-	add $t1, $t1, $t2
+	la $t2, 0($gp)  # load the display address
+	add $t1, $t1, $t2  # add the pixel offset to the display address
+
 	sw $t1, 0($sp)  # store the beginning pixel in the stack
 	
 	# pass the area of the sprite
