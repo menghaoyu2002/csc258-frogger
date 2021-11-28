@@ -9,14 +9,15 @@
 # - Display height in pixels: 512
 # - Base Address for Display: 0x10008000 ($gp)
 ## Which milestone is reached in this submission?
-# (See the assignment handout for descriptions of the milestones)
-# - Milestone 1/2/3/4/5 (choose the one the applies)
+# - Milestone 3 (choose the one the applies)
 ## Which approved additional features have been implemented?
 # (See the assignment handout for the list of additional features)
-# 1. (fill in the feature, if any)
-# 2. (fill in the feature, if any)# 3. (fill in the feature, if any)
-# ... (add more if necessary)## Any additional information that the TA needs to know:
-# - (write here, if any)
+# 1. Add a third row in each of the water and road sections - easy
+# 2. Make objects (frog, logs, turtles, vehicles,etc) look more like the arcade version. -easy
+# 3. Display the number of lives remaining. - easy
+# 4. After final player death, display gameover/retry screen. Restart the game if the “retry” option is chosen. - easy
+# 5. Have objects in different rows move at different speeds. - easy
+# 6. Display the player’s score at the top of thescreen. - hard
 #######################################################################
 
 .data
@@ -75,7 +76,7 @@ MainGameLoop:
 
 
 DrawFrog:
-	la $t0, ($gp)  # $t0 stores the base address for display
+	la $t0, 0($gp)  # $t0 stores the base address for display
 	lh $t5, x
 	lh $t6, y
 	mul $t6, $t6, 128  # multiply y with 128 to get the number of rows in pixels
@@ -92,7 +93,7 @@ FrogRows:
 	# $t3 is the current position of the pixel
 	# $t4 is the desired end position of the pixel
 	beq $t3, $t4, FrogColumns  # if we reached end of row go to next column
-	lw $t7, ($a0) # load the pixel color at this position
+	lw $t7, 0($a0) # load the pixel color at this position
 	beq $t7, 0, NextFrogPixel  # if the pixel is black, don't draw it
 	sw $t7, 0($t3)  # otherwise paint the pixel at $t3
 NextFrogPixel:
@@ -104,14 +105,14 @@ StopDrawingFrog:
 	
 	
 DrawSafeZone:
-	la $t0, ($gp) # $t0 stores the base address for display
+	la $t0, 0($gp) # $t0 stores the base address for display
 	add $t1, $t0, $a0  # define start location at (512, 504)
 	addi $t2, $t1, 4096 # define end location at (512, 512)
 	la $t3, safeZone  # store the address of the sprite colors in $t3
 DrawSafeZoneLoop: 
 	beq $t1, $t2, StopSafeZoneLoop # if end pixel is reached, stop drawing
-	lw $t4, ($t3)  # load the color from the sprite into $t4
-	sw $t4, ($t1)	# draw the pixel on the screen
+	lw $t4, 0($t3)  # load the color from the sprite into $t4
+	sw $t4, 0($t1)	# draw the pixel on the screen
 	addi $t1, $t1, 4 #increment the position counter to the next pixel
 	addi $t3, $t3, 4
 	j DrawSafeZoneLoop
@@ -120,14 +121,14 @@ StopSafeZoneLoop:
 
 
 DrawRoad:
-	la $t0, ($gp) # $t0 stores the base address for display
+	la $t0, 0($gp) # $t0 stores the base address for display
 	lw $t5, safeZonePos  # load the start of the safe zone
 	add $t1, $t0, $t5  # set $t1 to the start of the safe zone of the display
 	addi $t2, $t0, 65536  # set $t2 to the endpoint of the display
 	lw $t3, black  # load the color black into $t3
 DrawRoadLoop: 
 	beq $t1, $t2, ExitDrawRoadLoop  # if we draw every pixel up to and including the last one exit the loop
-	sw $t3, ($t1)  # draw the pixel at the location $t1
+	sw $t3, 0($t1)  # draw the pixel at the location $t1
 	addi $t1, $t1, 4  # increment $t1 to the next pixel
 	j DrawRoadLoop  # restart the loop
 ExitDrawRoadLoop:
@@ -135,27 +136,27 @@ ExitDrawRoadLoop:
 
 	
 DrawWater:
-	la $t0, ($gp) # $t0 stores the base address for display and the starting pixel i.e the top left corner
+	la $t0, 0($gp) # $t0 stores the base address for display and the starting pixel i.e the top left corner
 	lw $t5, safeZonePos  # load the start of the safe zone
 	add $t2, $t0, $t5    # set $t2 to the endpoint of the display
 	lw $t3, waterBlue  # load the color black into $t3
 DrawWaterLoop:
 	beq $t0, $t2, ExitDrawWaterLoop  # if we draw every pixel up to and including the last one exit the loop
-	sw $t3, ($t0)  # draw the pixel at the location $t1
+	sw $t3, 0($t0)  # draw the pixel at the location $t1
 	addi $t0, $t0, 4  # increment $t1 to the next pixel
 	j DrawWaterLoop  # restart the loop
 ExitDrawWaterLoop:
 	jr $ra 
 	
 DrawGoalRegion:
-	la $t0, ($gp)
+	la $t0, 0($gp)
 	addi $t1, $t0, 8192  # assign the start position
 	addi $t2, $t1, 8192  # end position which is $128x16 pixels away from start position
 	la $t3, goalRegion  # load the goal region sprite
 DrawGoalRegionLoop:
 	beq $t1, $t2, ExitDrawGoalRegionLoop
-	lw $t4, ($t3)  # load the color of the pixel
-	sw $t4, ($t1)  # draw the pixel at location $t1
+	lw $t4, 0($t3)  # load the color of the pixel
+	sw $t4, 0($t1)  # draw the pixel at location $t1
 	addi $t1, $t1, 4  # increment the location of the pixel by 1
 	addi $t3, $t3, 4  # increment the color pointer by 1
 	j DrawGoalRegionLoop
