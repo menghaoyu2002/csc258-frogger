@@ -118,7 +118,8 @@ MainGameLoop:
 	
 	# update the positions of the objects on the screen
 	jal UpdatePositions
-	#j MainGameLoop
+	
+	j MainGameLoop  # restart game loop
 EndGame:
 	j Exit
 
@@ -223,6 +224,8 @@ UpdatePositions:
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	jr $ra
+	
+	
 IsPositionInRange:
 	lw $a0, 0($sp)  # load the current X position address
 	addi $sp, $sp, 4
@@ -637,8 +640,6 @@ SpriteColumns:
 	beq $a1, $t2, StopDrawingSprite
 	add $t3, $a1, $zero  # set $t3 = $a1 the starting position
 	add $t4, $t3, $a3  # set $t4 pixels away from $t3
-	
-
 SpriteRows:
 	# $t3 is the current position of the pixel
 	# $t4 is the desired end position of the pixel
@@ -714,9 +715,9 @@ StopSafeZoneLoop:
 
 DrawRoad:
 	la $t0, 0($gp) # $t0 stores the base address for display
-	lw $t5, safeZonePos  # load the start of the safe zone
+	lw $t5, row6TruckPosY  # load the start of the safe zone
 	add $t1, $t0, $t5  # set $t1 to the start of the safe zone of the display
-	addi $t2, $t0, 65536  # set $t2 to the endpoint of the display
+	addi $t2, $t0, 61440  # set $t2 to the endpoint of the display
 	lw $t3, black  # load the color black into $t3
 DrawRoadLoop: 
 	beq $t1, $t2, ExitDrawRoadLoop  # if we draw every pixel up to and including the last one exit the loop
@@ -729,8 +730,10 @@ ExitDrawRoadLoop:
 	
 DrawWater:
 	la $t0, 0($gp) # $t0 stores the base address for display and the starting pixel i.e the top left corner
-	lw $t5, safeZonePos  # load the start of the safe zone
+	lw $t5, safeZonePos    # load the start of the safe zone
 	add $t2, $t0, $t5    # set $t2 to the endpoint of the display
+	lw $t1, row1LogPosY
+	add $t0, $t1, $t0
 	lw $t3, waterBlue  # load the color black into $t3
 DrawWaterLoop:
 	beq $t0, $t2, ExitDrawWaterLoop  # if we draw every pixel up to and including the last one exit the loop
