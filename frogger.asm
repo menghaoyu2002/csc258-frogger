@@ -112,7 +112,7 @@ DrawShortLog:
 	sw $ra, 0($sp)  # store the current $ra value
 	add $s0, $zero, $zero  # initialize the x offset to zero
 DrawShortLogLoop:
-	beq $s0, 360, EndShortLogLoop  # if the loop has iterated three times, end it
+	beq $s0, 576, EndShortLogLoop  # if the loop has iterated three times, end it
 	
 	# pass the sprite into the function
 	addi $sp, $sp, -4 
@@ -147,7 +147,7 @@ StoreFirstShortLogPixelPosition:
 
 	jal DrawSprite
 	
-	addi $s0, $s0, 180  # increment the x offset for the next log
+	addi $s0, $s0, 192  # increment the x offset for the next log
 	j DrawShortLogLoop
 EndShortLogLoop:	
 	# load the current $ra
