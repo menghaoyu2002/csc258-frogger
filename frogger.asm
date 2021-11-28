@@ -17,11 +17,13 @@
 # 3. Display the number of lives remaining. - easy
 # 4. After final player death, display gameover/retry screen. Restart the game if the �retry� option is chosen. - easy
 # 5. Have objects in different rows move at different speeds. - easy
-# 6. Display the player's score at the top of thescreen. - hard
+# 6. Display the player's score at the top of the screen. - hard
 #######################################################################
 
 .data
 	bitmapSpace: .space 32768 # allocate space for the bitmap to prevent overriting of values
+	
+	frame: .byte 0
 	
 	# the position of the frog, represents the top left corner of the frog
 	frogX: .word 240  
@@ -63,10 +65,8 @@
 	row10CarPosX: .word 0
 	row10CarPosY: .word 57344
 	
-	# run game if 1
-	runGame: .byte 1
 	# number of lives
-	numberOfLives: .byte 0
+	numberOfLives: .byte 3
 	
 	# sprites
 	# spawn + safezones
@@ -105,26 +105,95 @@
 .text	
 	
 MainGame:
-	# set the number of lives the player starts with
-	addi $t0, $zero, 3
-	sb $t0, numberOfLives
 MainGameLoop:
-	lb $t0, runGame  # load the value for run game 
-	bne $t0, 1, EndGame  # if runGame is false, end the game, otherwise continue running
+	lbu $t0, numberOfLives  # load the value for run game 
+	beq $t0, 0, EndGame  # if numberOfLives is zero, end the game, otherwise continue running
+	
+	jal CheckForInput
+	
+	# update the positions of the objects on the screen 
+	jal UpdatePositions
 	
 	# Draw the game
 	jal DrawGame
 	jal Sleep
 	
-	# update the positions of the objects on the screen
-	jal UpdatePositions
-	
 	j MainGameLoop  # restart game loop
 EndGame:
 	j Exit
+	
+	
+CheckForInput:
+	lw $t0, 0xffff0000  # check if there is an input
+	beq $t0, 1, HandleInput  # if there is an input, handle it
+	jr $ra   # otherwise return
+HandleInput:
+	lw $t0, 0xffff0004  # check the value of the input
+	
+	add $s4, $t0, $zero
+	
+	# if the input is an W
+	beq $t0, 87, HandleW
+	beq $t0, 119, HandleW
+	
+	# if the input is an A
+	beq $t0, 97, HandleA
+	beq $t0, 65, HandleA
+	
+	# if the input is an S
+	beq $t0, 115, HandleS
+	beq $t0, 83, HandleS
+	
+	# if the input is an D
+	beq $t0, 68, HandleD
+	beq $t0, 100, HandleD
+	
+	jr $ra
+HandleW:
+	lw $t0, frogY
+	addi $t0, $t0, -32
+	sw $t0, frogY
+	lw $t0, frogUp
+	sw $t0, currentFrog
+	jr $ra
+HandleA:
+	lw $t0, frogX
+	addi $t0, $t0, -32
+	lw $t1, frogLeft
+	bge $t0, 0, SaveFrogXPosition
+	addi $t0, $t0, 32
+SaveFrogXPosition:
+	sw $t0, frogX
+	sw $t1, currentFrog
+	jr $ra
+HandleS:
+	lw $t0, frogY
+	addi $t0, $t0, 32
+	
+	ble $t0, 480, SaveFrogYPosition
+	addi $t0, $t0, -32
+SaveFrogYPosition:	
+	sw $t0, frogY
+	lw $t0, frogDown
+	sw $t0, currentFrog
+	jr $ra
+HandleD:
+	lw $t0, frogX
+	addi $t0, $t0, 32
+	lw $t1, frogLeft
+	blt $t0, 480, SaveFrogXPosition
+	addi $t0, $t0, -32
+	j SaveFrogXPosition
 
 
 UpdatePositions:
+	lw $t0, frame
+	beq $t0, 1, CanUpdatePositions
+	addi $t0, $t0, 1
+	sw $t0, frame
+	jr $ra
+CanUpdatePositions:
+	sw $zero, frame
 	# save the current return address
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
@@ -213,7 +282,7 @@ UpdatePositions:
 	jal IsPositionInRange
 	
 	# increment the tenth row to the left
-	addi $t0, $zero, -32
+	addi $t0, $zero, -8
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	la $t0, row10CarPosX
