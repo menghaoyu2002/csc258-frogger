@@ -108,7 +108,6 @@ MainGame:
 	# set the number of lives the player starts with
 	addi $t0, $zero, 3
 	sb $t0, numberOfLives
-	
 MainGameLoop:
 	lb $t0, runGame  # load the value for run game 
 	bne $t0, 1, EndGame  # if runGame is false, end the game, otherwise continue running
@@ -116,9 +115,133 @@ MainGameLoop:
 	# Draw the game
 	jal DrawGame
 	jal Sleep
+	
+	# update the positions of the objects on the screen
+	jal UpdatePositions
+	#j MainGameLoop
 EndGame:
 	j Exit
 
+
+UpdatePositions:
+	# save the current return address
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	
+	# increment the first row to the right
+	addi $t0, $zero, 16
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row1LogPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the second row to the left
+	addi $t0, $zero, -32
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row2TurtlePosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+		
+	# increment the third row to the right
+	addi $t0, $zero, 8
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row3LogPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the fourth row to the left
+	addi $t0, $zero, -16
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row4LogPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the fifth row to the right
+	addi $t0, $zero, 16
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row5TurtlePosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the sixth row to the left
+	addi $t0, $zero, -64
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row6TruckPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the seventh row to the right
+	addi $t0, $zero, 16
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row7CarPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the eigth row to the left
+	addi $t0, $zero, -16
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row8CarPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+		
+	# increment the nineth row to the right
+	addi $t0, $zero, 4
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row9CarPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	# increment the tenth row to the left
+	addi $t0, $zero, -32
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	la $t0, row10CarPosX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal IsPositionInRange
+	
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	jr $ra
+IsPositionInRange:
+	lw $a0, 0($sp)  # load the current X position address
+	addi $sp, $sp, 4
+	
+	lw $a1, 0($sp)  # load the increment amount
+	addi $sp, $sp, 4
+	
+	lw $t0, 0($a0)  # load the current X position value
+	add $t0, $t0, $a1
+	bge $t0, 0, IsGreaterThan512
+	addi $t0, $t0, 512
+	j IsInRange
+IsGreaterThan512:
+	blt $t0, 512, IsInRange
+	addi $t0, $t0, -512
+IsInRange:
+	sw $t0, 0($a0) 
+	jr $ra
+	
 DrawGame:
 	sw $ra, 0($sp)  # save the current current address to the stack
 	# draw the different regions (water + road + goal)
