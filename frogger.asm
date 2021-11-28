@@ -26,7 +26,7 @@
 	frame: .byte 0
 	
 	# the position of the frog, represents the top left corner of the frog
-	frogX: .word 240  
+	frogX: .word 256
 	frogY: .word 480
 	
 	# positions
@@ -81,7 +81,7 @@
 	frogRight: .word 0x000000, 0x0fff00, 0x000000, 0x000000, 0x000000, 0x000000, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x0fff00, 0x0fff00, 0x000000, 0x000000, 0x0fff00, 0x0fff00, 0x0fff00, 0xc300ff, 0x000000, 0x000000, 0x000000, 0x0fff00, 0xf0ff00, 0xf0ff00, 0x0fff00, 0xf0ff00, 0xf0ff00, 0x000000, 0x000000, 0x0fff00, 0xf0ff00, 0xf0ff00, 0xf0ff00, 0xf0ff00, 0xf0ff00, 0x000000, 0x000000, 0x000000, 0x0fff00, 0x0fff00, 0x0fff00, 0xc300ff, 0x000000, 0x000000, 0x0fff00, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x000000, 0x000000, 0x000000, 0x000000, 0x0fff00, 0x000000
 	frogDown: .word 0x000000, 0x0fff00, 0x000000, 0x000000, 0x000000, 0x000000, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0xf0ff00, 0xf0ff00, 0x0fff00, 0x0fff00, 0x000000, 0x000000, 0x000000, 0x0fff00, 0xf0ff00, 0xf0ff00, 0x0fff00, 0x000000, 0x000000, 0x000000, 0x0fff00, 0x0fff00, 0xf0ff00, 0x0fff00, 0x0fff00, 0x0fff00, 0x000000, 0x000000, 0x0fff00, 0xc300ff, 0xf0ff00, 0xf0ff00, 0xc300ff, 0x0fff00, 0x000000, 0x0fff00, 0x0fff00, 0x000000, 0xf0ff00, 0xf0ff00, 0x000000, 0x0fff00, 0x0fff00, 0x000000, 0x0fff00, 0x000000, 0x000000, 0x000000, 0x000000, 0x0fff00, 0x000000
 	
-	currentFrog: .word frogUp
+	currentFrog: .word frogUp  # store the address of the current frog sprite
 	
 	# logs
 	shortLog: .word 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0xe26d3d, 0xe26d3d, 0x002d81, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0x002d81, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0x002d81, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xffffff, 0x002d81, 0x002d81, 0x002d81, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xffffff, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xe26d3d, 0xffffff, 0xffffff, 0xffffff, 0xffffff, 0x002d81, 0x002d81, 0xe26d3d, 0xffffff, 0xffffff, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xffffff, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xe26d3d, 0xffffff, 0x002d81, 0x002d81, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xe26d3d, 0xffffff, 0xffffff, 0xe26d3d, 0xe26d3d, 0xffffff, 0xffffff, 0xe26d3d, 0xe26d3d, 0xffffff, 0xe26d3d, 0xffffff, 0xffffff, 0x002d81, 0x002d81, 0xe26d3d, 0x7b5849, 0x7b5849, 0x002d81, 0xe26d3d, 0x7b5849, 0x7b5849, 0xffffff, 0x7b5849, 0xe26d3d, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0xe26d3d, 0x7b5849, 0xffffff, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0xffffff, 0xffffff, 0xffffff, 0x002d81, 0x002d81, 0x002d81, 0xe26d3d, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x002d81, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x002d81, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x002d81, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x7b5849, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81, 0x002d81
@@ -102,13 +102,12 @@
 	waterBlue: .word 0x002d81
 	white: .word 0xffffff
 	
-.text	
-	
-MainGame:
+.text		
 MainGameLoop:
 	lbu $t0, numberOfLives  # load the value for run game 
 	beq $t0, 0, EndGame  # if numberOfLives is zero, end the game, otherwise continue running
 	
+	# check for input and update the frog position
 	jal CheckForInput
 	
 	# update the positions of the objects on the screen 
@@ -150,145 +149,146 @@ HandleInput:
 	
 	jr $ra
 HandleW:
-	lw $t0, frogY
-	addi $t0, $t0, -32
-	sw $t0, frogY
-	la $t0, frogUp
-	sw $t0, currentFrog
+	lw $t0, frogY  # load the y position of the frog
+	addi $t0, $t0, -32  # move the frog up 32
+	sw $t0, frogY  # save the new position of the frog
+	la $t0, frogUp  # load the address of the new frog sprite
+	sw $t0, currentFrog   # make the current frog sprite the new sprite
 	jr $ra
 HandleA:
-	lw $t0, frogX
-	addi $t0, $t0, -32
-	la $t1, frogLeft
-	bge $t0, 0, SaveFrogXPosition
+	lw $t0, frogX  # load the x position of the frog
+	addi $t0, $t0, -32  # move the frog left by 32
+	la $t1, frogLeft  # save the address of the new sprite in $t1
+	bge $t0, 0, SaveFrogXPosition  # if the x value is negative, make it positive, otherwise save the x value
 	addi $t0, $t0, 32
 SaveFrogXPosition:
-	sw $t0, frogX
-	sw $t1, currentFrog
-	jr $ra
+	sw $t0, frogX  # save the x position of the frog
+	sw $t1, currentFrog  # save the address of the new sprite in currentFrog
+	jr $ra 
 HandleS:
-	lw $t0, frogY
-	addi $t0, $t0, 32
-	ble $t0, 480, SaveFrogYPosition
+	lw $t0, frogY  # load the y position of the frog
+	addi $t0, $t0, 32  # move the frog down 32
+	ble $t0, 480, SaveFrogYPosition  # if frog is out of bounds bring it back in bounds, otherwise just save the position
 	addi $t0, $t0, -32
 SaveFrogYPosition:	
-	sw $t0, frogY
-	la $t0, frogDown
-	sw $t0, currentFrog
+	sw $t0, frogY  # save the y position
+	la $t0, frogDown  # load the new frog sprite
+	sw $t0, currentFrog  # save the new frog sprite as the current frog sprite
 	jr $ra
 HandleD:
-	lw $t0, frogX
-	addi $t0, $t0, 32
-	la $t1, frogRight
-	blt $t0, 480, SaveFrogXPosition
+	lw $t0, frogX  # load the x position of the frog
+	addi $t0, $t0, 32  # move the frog right by 32
+	la $t1, frogRight  # load the frog facing right sprite
+	ble $t0, 480, SaveFrogXPosition  #  if frog is out of bounds bring it back in bounds, otherwise just save the position
 	addi $t0, $t0, -32
 	j SaveFrogXPosition
 
 
 UpdatePositions:
-	lw $t0, frame
-	beq $t0, 1, CanUpdatePositions
-	addi $t0, $t0, 1
-	sw $t0, frame
+	lw $t0, frame  # load the current frame number
+	beq $t0, 1, CanUpdatePositions  # check if we can update the objects on the screen
+	addi $t0, $t0, 1  # if we can't increase the frame by one
+	sw $t0, frame  # save the new frame and return
 	jr $ra
 CanUpdatePositions:
-	sw $zero, frame
+	sw $zero, frame  # if we can update, reset the frame count
 	# save the current return address
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	
 	# increment the first row to the right
-	addi $t0, $zero, 16
+	addi $t0, $zero, 16  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row1LogPosX
+	la $t0, row1LogPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the second row to the left
-	addi $t0, $zero, -32
+	addi $t0, $zero, -32  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row2TurtlePosX
+	la $t0, row2TurtlePosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 		
 	# increment the third row to the right
-	addi $t0, $zero, 8
+	addi $t0, $zero, 8   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row3LogPosX
+	la $t0, row3LogPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the fourth row to the left
-	addi $t0, $zero, -16
+	addi $t0, $zero, -16  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row4LogPosX
+	la $t0, row4LogPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the fifth row to the right
-	addi $t0, $zero, 16
+	addi $t0, $zero, 16  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row5TurtlePosX
+	la $t0, row5TurtlePosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the sixth row to the left
-	addi $t0, $zero, -64
+	addi $t0, $zero, -64  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row6TruckPosX
+	la $t0, row6TruckPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the seventh row to the right
-	addi $t0, $zero, 16
+	addi $t0, $zero, 16  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row7CarPosX
+	la $t0, row7CarPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the eigth row to the left
-	addi $t0, $zero, -16
+	addi $t0, $zero, -16  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row8CarPosX
+	la $t0, row8CarPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 		
 	# increment the nineth row to the right
-	addi $t0, $zero, 4
+	addi $t0, $zero, 4  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row9CarPosX
+	la $t0, row9CarPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the tenth row to the left
-	addi $t0, $zero, -8
+	addi $t0, $zero, -8  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row10CarPosX
+	la $t0, row10CarPosX  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
+	# restore the $ra and return
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	jr $ra
