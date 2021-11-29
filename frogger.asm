@@ -141,39 +141,44 @@ CheckForCollision:
 	mul $s0, $s0, 128  # translate the Y position into pixels
 	
 	# check if the frog is on the first row
-	lw $t0, row1Y  # load the y value of the row
+	lw $t3, row1Y  # load the y value of the row
+	lw $t0, row1X  # load the X value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
-	lw $t3, row1Speed
-	beq $s0, $t0, CheckWaterRow
+	lw $s7, row1Speed
+	beq $s0, $t3, CheckWaterRow
 	
 	# check if the frog is on the second row
-	lw $t0, row2Y  # load the y value of the row
+	lw $t3, row2Y  # load the y value of the row
+	lw $t0, row2X  # load the X value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
-	lw $t3, row2Speed
-	beq $s0, $t0, CheckWaterRow
+	lw $s7, row2Speed
+	beq $s0, $t3, CheckWaterRow
 	
 	# check if the frog is on the third row
-	lw $t0, row3Y  # load the y value of the row
-	addi $t1, $zero, 128
-	addi $t2, $zero, 168
-	lw $t3, row3Speed
-	beq $s0, $t0, CheckWaterRow
+	lw $t3, row3Y  # load the y value of the row
+	lw $t0, row3X  # load the X value of the row
+	addi $t1, $zero, 192
+	addi $t2, $zero, 256
+	lw $s7, row3Speed
+	beq $s0, $t3, CheckWaterRow
 	
 	# check if the frog is on the fourth row
-	lw $t0, row4Y  # load the y value of the row
+	lw $t3, row4Y  # load the y value of the row
+	lw $t0, row4X  # load the X value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
-	lw $t3, row4Speed
-	beq $s0, $t0, CheckWaterRow
+	lw $s7, row4Speed
+	beq $s0, $t3, CheckWaterRow
 	
 	# check if the frog is on the fifth row
-	lw $t0, row5Y  # load the y value of the row
+	lw $t3, row5Y  # load the y value of the row
+	lw $t0, row7X  # load the X value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
-	lw $t3, row5Speed
-	beq $s0, $t0, CheckWaterRow
+	lw $s7, row5Speed
+	beq $s0, $t3, CheckWaterRow
 	
 	# check if the frog is on the sixth row
 	lw $t3, row6Y  # load the y value of the row
@@ -212,7 +217,42 @@ CheckForCollision:
 FinishedCollisionCheck:
 	jr $ra
 CheckWaterRow:
-	j FinishedCollisionCheck
+	# save the current $ra
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	
+	# pass the location of the sprite
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	
+	# pass the hazardous width of the sprite
+	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	
+	# pass the full width of the sprite
+	addi $sp, $sp, -4
+	sw $t2, 0($sp)
+	
+	jal HasOverlap  # check if there is an overlap
+	
+	lb $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
+	addi $sp, $sp, 4
+	
+	lw $ra, 0($sp)  # restore the return address
+	addi $sp, $sp, 4
+	
+	beq $v0, 0, TriggerLifeLoss  # if there is no collision, then the frog is in water
+FrogFloating:  # if frog is not in water/is collided with an object
+	lw $t1, frogX  # load the x value of the frog
+	add $t1, $t1, $s7  # move the frog at the same speed as the object
+	# if the frog moves offscreen, player loses life
+	bgt $t1, 480, TriggerLifeLoss
+	blt $t1, 0, TriggerLifeLoss
+	
+	# if the frog is in a valid position
+	sw $t1, frogX
+	j FinishedCollisionCheck  # otherwise the collision check is finished
+
 CheckRoadRow:
 	# save the current $ra
 	addi $sp, $sp, -4
@@ -239,7 +279,7 @@ CheckRoadRow:
 	addi $sp, $sp, 4
 	
 	beq $v0, 0, FinishedCollisionCheck  # if there is no collision, finish the check
-	
+TriggerLifeLoss:
 	# if there is a collision, set the player to the starting point 
 	addi $t0, $zero, 256
 	sw $t0, frogX
@@ -250,7 +290,6 @@ CheckRoadRow:
 	addi $t0, $t0, -1
 	sb $t0, numberOfLives
 	
-
 	j FinishedCollisionCheck
 	
 	
