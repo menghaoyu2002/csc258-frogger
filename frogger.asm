@@ -23,8 +23,6 @@
 .data
 	bitmapSpace: .space 32768 # allocate space for the bitmap to prevent overriting of values
 	
-	frame: .byte 0
-	
 	# the position of the frog, represents the top left corner of the frog
 	frogX: .word 256
 	frogY: .word 480
@@ -34,36 +32,46 @@
 	safeZonePos: .word 36864
 	
 	# water rows
-	row1LogPosX: .word 0
-	row1LogPosY: .word 16384
+	row1X: .word 0
+	row1Y: .word 16384
+	row1Speed: .byte 16
 	
-	row2TurtlePosX: .word 0
-	row2TurtlePosY: .word 20480
+	row2X: .word 0
+	row2Y: .word 20480
+	row2Speed: .byte -32
 	
-	row3LogPosX: .word 0
-	row3LogPosY: .word 24576
+	row3X: .word 0
+	row3Y: .word 24576
+	row3Speed: .byte 8
 	
-	row4LogPosX: .word 0
-	row4LogPosY: .word 28672
+	row4X: .word 0
+	row4Y: .word 28672
+	row4Speed: .byte -16
 	
-	row5TurtlePosX: .word 0
-	row5TurtlePosY: .word 32768
+	row5X: .word 0
+	row5Y: .word 32768
+	row5Speed: .byte 16
 	
 	# road rows
-	row6TruckPosX: .word 0
-	row6TruckPosY: .word 40960
+	row6X: .word 0
+	row6Y: .word 40960
+	row6Speed: .byte -32
 	
-	row7CarPosX: .word 0
-	row7CarPosY: .word 45056
+	row7X: .word 0
+	row7Y: .word 45056
+	row7Speed: .byte 16
 	
-	row8CarPosX: .word 0
-	row8CarPosY: .word 49152
+	row8X: .word 0
+	row8Y: .word 49152
+	row8Speed: .byte -16
 	
-	row9CarPosX: .word 0
-	row9CarPosY: .word 53248
+	row9X: .word 0
+	row9Y: .word 53248
+	row9Speed: .byte 4
 	
-	row10CarPosX: .word 0
-	row10CarPosY: .word 57344
+	row10X: .word 0
+	row10Y: .word 57344
+	row10Speed: .byte -8
 	
 	# number of lives
 	numberOfLives: .byte 3
@@ -110,6 +118,9 @@ MainGameLoop:
 	# check for input and update the frog position
 	jal CheckForInput
 	
+	# check for collision
+	jal CheckForCollision
+	
 	# update the positions of the objects on the screen 
 	jal UpdatePositions
 	
@@ -121,6 +132,129 @@ MainGameLoop:
 EndGame:
 	j Exit
 	
+	
+CheckForCollision:
+	lw $s0, frogY  # load the current Y position of the frog
+	mul $s0, $s0, 128  # translate the Y position into pixels
+	
+	# check if the frog is on the first row
+	lw $a0, row1Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	addi $a3, $zero, 16
+	beq $s0, $a0, CheckWaterRow
+	
+	# check if the frog is on the second row
+	lw $a0, row2Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	addi $a3, $zero, -32
+	beq $s0, $a0, CheckWaterRow
+	
+	# check if the frog is on the third row
+	lw $a0, row3Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	addi $a3, $zero, 8
+	beq $s0, $a0, CheckWaterRow
+	
+	# check if the frog is on the fourth row
+	lw $a0, row4Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	addi $a3, $zero, -16
+	beq $s0, $a0, CheckWaterRow
+	
+	# check if the frog is on the fifth row
+	lw $a0, row5Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	beq $s0, $a0, CheckWaterRow
+	
+	# check if the frog is on the sixth row
+	lw $a0, row6Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	beq $s0, $a0, CheckWaterRow
+	
+	# check if the frog is on the seventh row
+	lw $a0, row7Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	beq $s0, $a0, CheckRoadRow
+	
+	# check if the frog is on the eigth row
+	lw $a0, row8Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	beq $s0, $a0, CheckRoadRow
+	
+	# check if the frog is on the ninth row
+	lw $a0, row9Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	beq $s0, $a0, CheckRoadRow
+	
+	# check if the frog is on the tenth row
+	lw $a0, row10Y
+	addi $a1, $zero, 128
+	addi $a2, $zero, 168
+	beq $s0, $a0, CheckRoadRow
+FinishedCollisionCheck:
+	jr $ra
+
+CheckWaterRow:
+	# save the current $ra
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	
+	# pass the location of the sprite
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	
+	# pass the hazardous width of the sprite
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	
+	# pass the full width of the sprite
+	addi $sp, $sp, -4
+	sw $a2, 0($sp)
+	
+	# pass the speed of the sprite
+	addi $sp, $sp, -4
+	sw $a3, 0($sp)
+	
+	jal HasOverlap
+	lw $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
+	 
+	lw $ra, 0($sp)
+	j FinishedCollisionCheck
+CheckRoadRow:
+	# save the current $ra
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	
+	# pass the location of the sprite
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	
+	# pass the hazardous width of the sprite
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	
+	# pass the full width of the sprite
+	addi $sp, $sp, -4
+	sw $a2, 0($sp)
+	
+	# pass the speed of the sprite
+	addi $sp, $sp, -4
+	sw $a3, 0($sp)
+	
+	jal HasOverlap
+	lw $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
+	j FinishedCollisionCheck
+HasOverlap:
+	jr $ra
 	
 CheckForInput:
 	lw $t0, 0xffff0000  # check if there is an input
@@ -185,105 +319,98 @@ HandleD:
 
 
 UpdatePositions:
-	lw $t0, frame  # load the current frame number
-	beq $t0, 1, CanUpdatePositions  # check if we can update the objects on the screen
-	addi $t0, $t0, 1  # if we can't increase the frame by one
-	sw $t0, frame  # save the new frame and return
-	jr $ra
-CanUpdatePositions:
-	sw $zero, frame  # if we can update, reset the frame count
 	# save the current return address
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	
 	# increment the first row to the right
-	addi $t0, $zero, 16  # pass the increment amount
+	lb $t0, row1Speed  # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row1LogPosX  # pass the address of the x position
+	la $t0, row1X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the second row to the left
-	addi $t0, $zero, -32  # pass the increment amount
+	lb $t0, row2Speed # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row2TurtlePosX  # pass the address of the x position
+	la $t0, row2X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 		
 	# increment the third row to the right
-	addi $t0, $zero, 8   # pass the increment amount
+	lb $t0, row3Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row3LogPosX  # pass the address of the x position
+	la $t0, row3X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the fourth row to the left
-	addi $t0, $zero, -16  # pass the increment amount
+	lb $t0, row4Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row4LogPosX  # pass the address of the x position
+	la $t0, row4X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the fifth row to the right
-	addi $t0, $zero, 16  # pass the increment amount
+	lb $t0, row5Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row5TurtlePosX  # pass the address of the x position
+	la $t0, row5X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the sixth row to the left
-	addi $t0, $zero, -64  # pass the increment amount
+	lb $t0, row6Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row6TruckPosX  # pass the address of the x position
+	la $t0, row6X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the seventh row to the right
-	addi $t0, $zero, 16  # pass the increment amount
+	lb $t0, row7Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row7CarPosX  # pass the address of the x position
+	la $t0, row7X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the eigth row to the left
-	addi $t0, $zero, -16  # pass the increment amount
+	lb $t0, row8Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row8CarPosX  # pass the address of the x position
+	la $t0, row8X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 		
 	# increment the nineth row to the right
-	addi $t0, $zero, 4  # pass the increment amount
+	lb $t0, row9Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row9CarPosX  # pass the address of the x position
+	la $t0, row9X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
 	
 	# increment the tenth row to the left
-	addi $t0, $zero, -8  # pass the increment amount
+	lb $t0, row10Speed   # pass the increment amount
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	la $t0, row10CarPosX  # pass the address of the x position
+	la $t0, row10X  # pass the address of the x position
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal IsPositionInRange
@@ -332,28 +459,28 @@ DrawGame:
 	jal DrawSafeZone
 	
 	# draw the logs in the first row
-	lw $t0, row1LogPosX
+	lw $t0, row1X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row1LogPosY
+	lw $t0, row1Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawShortLog
 	
 	# draw the turtles in the second row
-	lw $t0, row2TurtlePosX
+	lw $t0, row2X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row2TurtlePosY
+	lw $t0, row2Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawTurtle
 	
 	# draw the logs in the third row
-	lw $t0, row4LogPosX
+	lw $t0, row4X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row4LogPosY
+	lw $t0, row4Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawShortLog
@@ -362,10 +489,10 @@ DrawGame:
 	jal DrawRow3Log
 	
 	# draw the turtles in the fifth row
-	lw $t0, row5TurtlePosX
+	lw $t0, row5X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row5TurtlePosY
+	lw $t0, row5Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawTurtle
@@ -377,10 +504,10 @@ DrawGame:
 	la $t0, greyPointRaceCar
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row7CarPosX
+	lw $t0, row7X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row7CarPosY
+	lw $t0, row7Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawCar
@@ -389,10 +516,10 @@ DrawGame:
 	la $t0, pinkCar
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row8CarPosX
+	lw $t0, row8X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row8CarPosY
+	lw $t0, row8Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawCar
@@ -401,10 +528,10 @@ DrawGame:
 	la $t0, greyRaceCarSpoiler
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row9CarPosX
+	lw $t0, row9X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row9CarPosY
+	lw $t0, row9Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawCar
@@ -413,10 +540,10 @@ DrawGame:
 	la $t0, yellowPointRaceCar
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row10CarPosX
+	lw $t0, row10X
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, row10CarPosY
+	lw $t0, row10Y
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal DrawCar
@@ -441,13 +568,13 @@ DrawTruckLoop:
 	sw $t0, 0($sp) 
 	
 	# pass the beginning pixel into the function
-	lw $t0, row6TruckPosX  # load the x position of the log into $t0
+	lw $t0, row6X  # load the x position of the log into $t0
 	add $t0, $t0, $s0  # add the x offset to the x position
 	
 	blt $t0, 512, StoreFirstTruckPixelPosition  # if the x position is greater than 512 due to the offset
 	addi $t0, $t0, -512  # subtract 512 from it, that is, $t0 = $t0 % 512
 StoreFirstTruckPixelPosition:
-	lw $t1, row6TruckPosY  # load the y position of the frog into $t1
+	lw $t1, row6Y  # load the y position of the frog into $t1
 	# calculate the beginning pixel of the sprite
 	add $t1, $t1, $t0
 	la $t2, 0($gp)  # load the display address
@@ -651,13 +778,13 @@ DrawRow3LogLoop:
 	
 	# pass the beginning pixel into the function
 	addi $sp, $sp, -4 
-	lw $t0, row3LogPosX  # load the x position of the log into $t0
+	lw $t0, row3X  # load the x position of the log into $t0
 	add $t0, $t0, $s0  # add the x offset to the x position
 	
 	blt $t0, 512, StoreFirstRow3LogPixelPosition  # if the x position is greater than 512 due to the offset
 	addi $t0, $t0, -512  # subtract 512 from it, that is, $t0 = $t0 % 512
 StoreFirstRow3LogPixelPosition:
-	lw $t1, row3LogPosY  # load the y position of the frog into $t1
+	lw $t1, row3Y  # load the y position of the frog into $t1
 	# calculate the beginning pixel of the sprite
 	add $t1, $t1, $t0
 	la $t2, 0($gp)  # load the display address
@@ -783,7 +910,7 @@ StopSafeZoneLoop:
 
 DrawRoad:
 	la $t0, 0($gp) # $t0 stores the base address for display
-	lw $t5, row6TruckPosY  # load the start of the safe zone
+	lw $t5, row6Y  # load the start of the safe zone
 	add $t1, $t0, $t5  # set $t1 to the start of the safe zone of the display
 	addi $t2, $t0, 61440  # set $t2 to the endpoint of the display
 	lw $t3, black  # load the color black into $t3
@@ -800,7 +927,7 @@ DrawWater:
 	la $t0, 0($gp) # $t0 stores the base address for display and the starting pixel i.e the top left corner
 	lw $t5, safeZonePos    # load the start of the safe zone
 	add $t2, $t0, $t5    # set $t2 to the endpoint of the display
-	lw $t1, row1LogPosY
+	lw $t1, row1Y
 	add $t0, $t1, $t0
 	lw $t3, waterBlue  # load the color black into $t3
 DrawWaterLoop:
@@ -830,7 +957,7 @@ ExitDrawGoalRegionLoop:
 	
 Sleep:
 	li $v0, 32
-	li $a0, 16  # sleep by 1/60 of a second
+	li $a0, 32  # sleep by 1/60 of a second
 	syscall
 	jr $ra
 				
