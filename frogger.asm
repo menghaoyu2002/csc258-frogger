@@ -25,7 +25,7 @@
 	
 	# the position of the frog, represents the top left corner of the frog
 	frogX: .word 256
-	frogY: .word 480
+	frogY: .word 288
 	
 	# positions
 	spawnPos: .word 61440
@@ -34,19 +34,19 @@
 	# water rows
 	row1X: .word 0
 	row1Y: .word 16384
-	row1Speed: .byte 16
+	row1Speed: .word 16
 	
 	row2X: .word 0
 	row2Y: .word 20480
-	row2Speed: .byte -32
+	row2Speed: .word -32
 	
 	row3X: .word 0
 	row3Y: .word 24576
-	row3Speed: .byte 8
+	row3Speed: .word 8
 	
 	row4X: .word 0
 	row4Y: .word 28672
-	row4Speed: .byte -16
+	row4Speed: .word -16
 	
 	row5X: .word 0
 	row5Y: .word 32768
@@ -55,23 +55,23 @@
 	# road rows
 	row6X: .word 0
 	row6Y: .word 40960
-	row6Speed: .byte -16
+	row6Speed: .word -16
 	
 	row7X: .word 0
 	row7Y: .word 45056
-	row7Speed: .byte 16
+	row7Speed: .word 16
 	
 	row8X: .word 0
 	row8Y: .word 49152
-	row8Speed: .byte -16
+	row8Speed: .word -16
 	
 	row9X: .word 0
 	row9Y: .word 53248
-	row9Speed: .byte 4
+	row9Speed: .word 4
 	
 	row10X: .word 0
 	row10Y: .word 57344
-	row10Speed: .byte -8
+	row10Speed: .word -8
 	
 	# number of lives
 	numberOfLives: .byte 3
@@ -143,7 +143,7 @@ CheckForCollision:
 	# check if the frog is on the first row
 	lw $t3, row1Y  # load the y value of the row
 	lw $t0, row1X  # load the X value of the row
-	addi $t1, $zero, 128
+	addi $t1, $zero, 100
 	addi $t2, $zero, 168
 	lw $s7, row1Speed
 	beq $s0, $t3, CheckWaterRow
@@ -151,7 +151,7 @@ CheckForCollision:
 	# check if the frog is on the second row
 	lw $t3, row2Y  # load the y value of the row
 	lw $t0, row2X  # load the X value of the row
-	addi $t1, $zero, 128
+	addi $t1, $zero, 100
 	addi $t2, $zero, 168
 	lw $s7, row2Speed
 	beq $s0, $t3, CheckWaterRow
@@ -159,7 +159,7 @@ CheckForCollision:
 	# check if the frog is on the third row
 	lw $t3, row3Y  # load the y value of the row
 	lw $t0, row3X  # load the X value of the row
-	addi $t1, $zero, 192
+	addi $t1, $zero, 164
 	addi $t2, $zero, 256
 	lw $s7, row3Speed
 	beq $s0, $t3, CheckWaterRow
@@ -167,15 +167,15 @@ CheckForCollision:
 	# check if the frog is on the fourth row
 	lw $t3, row4Y  # load the y value of the row
 	lw $t0, row4X  # load the X value of the row
-	addi $t1, $zero, 128
+	addi $t1, $zero, 100
 	addi $t2, $zero, 168
 	lw $s7, row4Speed
 	beq $s0, $t3, CheckWaterRow
 	
 	# check if the frog is on the fifth row
 	lw $t3, row5Y  # load the y value of the row
-	lw $t0, row7X  # load the X value of the row
-	addi $t1, $zero, 128
+	lw $t0, row5X  # load the X value of the row
+	addi $t1, $zero, 100
 	addi $t2, $zero, 168
 	lw $s7, row5Speed
 	beq $s0, $t3, CheckWaterRow
@@ -241,7 +241,7 @@ CheckWaterRow:
 	lw $ra, 0($sp)  # restore the return address
 	addi $sp, $sp, 4
 	
-	beq $v0, 0, TriggerLifeLoss  # if there is no collision, then the frog is in water
+	beq $v0, 0, TriggerLifeLoss  # if there no collision, then the frog is in water
 FrogFloating:  # if frog is not in water/is collided with an object
 	lw $t1, frogX  # load the x value of the frog
 	add $t1, $t1, $s7  # move the frog at the same speed as the object
@@ -1041,7 +1041,7 @@ ExitDrawGoalRegionLoop:
 	
 Sleep:
 	li $v0, 32
-	li $a0, 16  # sleep by 1/60 of a second
+	li $a0, 32  # sleep by 1/60 of a second
 	syscall
 	jr $ra
 				
