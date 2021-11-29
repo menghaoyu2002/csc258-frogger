@@ -15,7 +15,7 @@
 # 1. Add a third row in each of the water and road sections - easy
 # 2. Make objects (frog, logs, turtles, vehicles,etc) look more like the arcade version. -easy
 # 3. Display the number of lives remaining. - easy
-# 4. After final player death, display gameover/retry screen. Restart the game if the �retry� option is chosen. - easy
+# 4. After final player death, display gameover/retry screen. Restart the game if the retry option is chosen. - easy
 # 5. Have objects in different rows move at different speeds. - easy
 # 6. Display the player's score at the top of the screen. - hard
 #######################################################################
@@ -55,7 +55,7 @@
 	# road rows
 	row6X: .word 0
 	row6Y: .word 40960
-	row6Speed: .byte -32
+	row6Speed: .byte -16
 	
 	row7X: .word 0
 	row7Y: .word 45056
@@ -111,6 +111,10 @@
 	white: .word 0xffffff
 	
 .text		
+MainGame:
+	# give the player three lives on game start
+	addi $t0, $zero, 3
+	sb $t0, numberOfLives
 MainGameLoop:
 	lbu $t0, numberOfLives  # load the value for run game 
 	beq $t0, 0, EndGame  # if numberOfLives is zero, end the game, otherwise continue running
@@ -132,102 +136,78 @@ MainGameLoop:
 EndGame:
 	j Exit
 	
-	
 CheckForCollision:
 	lw $s0, frogY  # load the current Y position of the frog
 	mul $s0, $s0, 128  # translate the Y position into pixels
 	
 	# check if the frog is on the first row
-	lw $a0, row1Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	addi $a3, $zero, 16
-	beq $s0, $a0, CheckWaterRow
+	lw $t0, row1Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	lw $t3, row1Speed
+	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the second row
-	lw $a0, row2Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	addi $a3, $zero, -32
-	beq $s0, $a0, CheckWaterRow
+	lw $t0, row2Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	lw $t3, row2Speed
+	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the third row
-	lw $a0, row3Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	addi $a3, $zero, 8
-	beq $s0, $a0, CheckWaterRow
+	lw $t0, row3Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	lw $t3, row3Speed
+	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the fourth row
-	lw $a0, row4Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	addi $a3, $zero, -16
-	beq $s0, $a0, CheckWaterRow
+	lw $t0, row4Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	lw $t3, row4Speed
+	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the fifth row
-	lw $a0, row5Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	beq $s0, $a0, CheckWaterRow
+	lw $t0, row5Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	lw $t3, row5Speed
+	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the sixth row
-	lw $a0, row6Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	beq $s0, $a0, CheckWaterRow
+	lw $t0, row6Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	beq $s0, $t0, CheckRoadRow
 	
 	# check if the frog is on the seventh row
-	lw $a0, row7Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	beq $s0, $a0, CheckRoadRow
+	lw $t0, row7Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	beq $s0, $t0, CheckRoadRow
 	
 	# check if the frog is on the eigth row
-	lw $a0, row8Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	beq $s0, $a0, CheckRoadRow
+	lw $t0, row8Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	beq $s0, $t0, CheckRoadRow
 	
 	# check if the frog is on the ninth row
-	lw $a0, row9Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	beq $s0, $a0, CheckRoadRow
+	lw $t0, row9Y
+	addi $t1, $zero, 128
+	addi $t2, $zero, 168
+	beq $s0, $t0, CheckRoadRow
 	
 	# check if the frog is on the tenth row
-	lw $a0, row10Y
-	addi $a1, $zero, 128
-	addi $a2, $zero, 168
-	beq $s0, $a0, CheckRoadRow
+	lw $t3, row10Y
+	lw $t0, row10X
+	addi $t1, $zero, 32
+	addi $t2, $zero, 168
+	beq $s0, $t3, CheckRoadRow
 FinishedCollisionCheck:
 	jr $ra
-
 CheckWaterRow:
-	# save the current $ra
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	
-	# pass the location of the sprite
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	
-	# pass the hazardous width of the sprite
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	
-	# pass the full width of the sprite
-	addi $sp, $sp, -4
-	sw $a2, 0($sp)
-	
-	# pass the speed of the sprite
-	addi $sp, $sp, -4
-	sw $a3, 0($sp)
-	
-	jal HasOverlap
-	lw $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
-	 
-	lw $ra, 0($sp)
 	j FinishedCollisionCheck
 CheckRoadRow:
 	# save the current $ra
@@ -236,25 +216,86 @@ CheckRoadRow:
 	
 	# pass the location of the sprite
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
+	sw $t0, 0($sp)
 	
 	# pass the hazardous width of the sprite
 	addi $sp, $sp, -4
-	sw $a1, 0($sp)
+	sw $t1, 0($sp)
 	
 	# pass the full width of the sprite
 	addi $sp, $sp, -4
-	sw $a2, 0($sp)
+	sw $t2, 0($sp)
 	
-	# pass the speed of the sprite
-	addi $sp, $sp, -4
-	sw $a3, 0($sp)
+	jal HasOverlap  # check if there is an overlap
 	
-	jal HasOverlap
-	lw $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
+	lb $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
+	addi $sp, $sp, 4
+	
+	lw $ra, 0($sp)  # restore the return address
+	addi $sp, $sp, 4
+	
+	beq $v0, 0, FinishedCollisionCheck  # if there is no collision, finish the check
+	
+	# if there is a collision, set the player to the starting point 
+	addi $t0, $zero, 256
+	sw $t0, frogX
+	addi $t0, $zero, 480
+	sw $t0, frogY
+	# lose a life if there is a collision
+	lb $t0, numberOfLives
+	addi $t0, $t0, -1
+	sb $t0, numberOfLives
+	
+
 	j FinishedCollisionCheck
+	
+	
 HasOverlap:
+	lw $a2, 0($sp)  # load the width of the sprite into $a2
+	addi $sp, $sp, 4
+	lw $a1, 0($sp)  # load the hazardous width of the sprite into $a1
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)  # load the beginning position of the sprite into $a0
+	addi $sp, $sp, 4
+	
+	# store the number of times the sprite is drawn in $t0
+	addi $t0, $zero, 512
+	div $t0, $t0, $a2
+CheckOverlapLoop:
+	beq $t0, 0, NoOverlapFound  # if we've iterated through all the sprites and none have overlaps, then there are no overlaps
+	lw $t1, frogX  # store the x position of the frog in $t1
+	# a0 is the start positin, $t2 is the end position
+	add $t2, $a0, $a1  # the end position
+	ble $t2, 512, NoWrapCheck  # if the endpoint of the sprite wraps around, deal with this on a case by case basis
+HasWrapCheck:  # case $t2 < $a0, endpoint less than start point
+	addi $t2, $t2, -512
+	# if the frog is not contained between $t2 and $a0 then it overlaps
+	ble $t1, $t2, OverlapFound  # if the starting pixel of the frog is before the starting pixel of the middle area, there is an overlap
+	addi $t1, $t1, 32
+	bge $t1, $a0, OverlapFound # if the ending pixel of the frog is after the ending pixel of the middle area, there is a overlap
+	j GoToNextOverlapLoop  # if the frog is contained in the middle area, there is no overlap, so go to the next sprite position
+NoWrapCheck:  # case $a0 <= $t2
+	bgt $t1, $t2, GoToNextOverlapLoop  # if the start point is past the end point of the sprite, no overlap
+	addi $t1, $t1, 32  # end pixel of frog
+	blt $t1, $a0, GoToNextOverlapLoop  # if the end point of the frog is before the start point of the sprite, no overlap
+	j OverlapFound  # otherwise there is an overlap
+GoToNextOverlapLoop:
+	addi $t0, $t0, -1  # decrement $t0 by 1
+	add $a0, $a0, $a2  # increment $a0 to the next starting sprite pixel
+	blt $a0, 512, CheckOverlapLoop  # if the x position of the sprite is on the next line
+	addi $a0, $a0, -512 #  subtrat 512 from it so it's on this line
+	j CheckOverlapLoop
+OverlapFound:
+	addi $sp, $sp, -4
+	addi $t0, $zero, 1
+	sb $t0, 0($sp)
 	jr $ra
+NoOverlapFound:
+	addi $sp, $sp, -4
+	sb $zero, 0($sp)
+	jr $ra
+	
+	
 	
 CheckForInput:
 	lw $t0, 0xffff0000  # check if there is an input
@@ -957,7 +998,7 @@ ExitDrawGoalRegionLoop:
 	
 Sleep:
 	li $v0, 32
-	li $a0, 32  # sleep by 1/60 of a second
+	li $a0, 16  # sleep by 1/60 of a second
 	syscall
 	jr $ra
 				
