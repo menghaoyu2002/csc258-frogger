@@ -141,66 +141,70 @@ CheckForCollision:
 	mul $s0, $s0, 128  # translate the Y position into pixels
 	
 	# check if the frog is on the first row
-	lw $t0, row1Y
+	lw $t0, row1Y  # load the y value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
 	lw $t3, row1Speed
 	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the second row
-	lw $t0, row2Y
+	lw $t0, row2Y  # load the y value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
 	lw $t3, row2Speed
 	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the third row
-	lw $t0, row3Y
+	lw $t0, row3Y  # load the y value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
 	lw $t3, row3Speed
 	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the fourth row
-	lw $t0, row4Y
+	lw $t0, row4Y  # load the y value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
 	lw $t3, row4Speed
 	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the fifth row
-	lw $t0, row5Y
+	lw $t0, row5Y  # load the y value of the row
 	addi $t1, $zero, 128
 	addi $t2, $zero, 168
 	lw $t3, row5Speed
 	beq $s0, $t0, CheckWaterRow
 	
 	# check if the frog is on the sixth row
-	lw $t0, row6Y
-	addi $t1, $zero, 128
-	addi $t2, $zero, 168
-	beq $s0, $t0, CheckRoadRow
+	lw $t3, row6Y  # load the y value of the row
+	lw $t0, row6X  # load the X value of the row
+	addi $t1, $zero, 64
+	addi $t2, $zero, 256
+	beq $s0, $t3, CheckRoadRow
 	
 	# check if the frog is on the seventh row
-	lw $t0, row7Y
-	addi $t1, $zero, 128
+	lw $t3, row7Y  # load the y value of the row
+	lw $t0, row7X  # load the X value of the row
+	addi $t1, $zero, 32
 	addi $t2, $zero, 168
-	beq $s0, $t0, CheckRoadRow
+	beq $s0, $t3, CheckRoadRow
 	
 	# check if the frog is on the eigth row
-	lw $t0, row8Y
-	addi $t1, $zero, 128
+	lw $t3, row8Y  # load the y value of the row
+	lw $t0, row8X  # load the X value of the row
+	addi $t1, $zero, 32
 	addi $t2, $zero, 168
-	beq $s0, $t0, CheckRoadRow
+	beq $s0, $t3, CheckRoadRow
 	
 	# check if the frog is on the ninth row
-	lw $t0, row9Y
-	addi $t1, $zero, 128
-	addi $t2, $zero, 168
-	beq $s0, $t0, CheckRoadRow
+	lw $t3, row9Y  # load the y value of the row
+	lw $t0, row9X  # load the X value of the row
+	addi $t1, $zero, 32  # width of sprite
+	addi $t2, $zero, 168  # full width of sprite, including excess spacing
+	beq $s0, $t3, CheckRoadRow  # if the frog is in the row, check if there's an overlap
 	
 	# check if the frog is on the tenth row
-	lw $t3, row10Y
+	lw $t3, row10Y  # load the y value of the row
 	lw $t0, row10X
 	addi $t1, $zero, 32
 	addi $t2, $zero, 168
