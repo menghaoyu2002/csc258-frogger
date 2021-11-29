@@ -143,7 +143,7 @@ CheckForCollision:
 	# check if the frog is on the first row
 	lw $t3, row1Y  # load the y value of the row
 	lw $t0, row1X  # load the X value of the row
-	addi $t1, $zero, 100
+	addi $t1, $zero, 96
 	addi $t2, $zero, 168
 	lw $s7, row1Speed
 	beq $s0, $t3, CheckWaterRow
@@ -151,7 +151,7 @@ CheckForCollision:
 	# check if the frog is on the second row
 	lw $t3, row2Y  # load the y value of the row
 	lw $t0, row2X  # load the X value of the row
-	addi $t1, $zero, 100
+	addi $t1, $zero, 96
 	addi $t2, $zero, 168
 	lw $s7, row2Speed
 	beq $s0, $t3, CheckWaterRow
@@ -159,7 +159,7 @@ CheckForCollision:
 	# check if the frog is on the third row
 	lw $t3, row3Y  # load the y value of the row
 	lw $t0, row3X  # load the X value of the row
-	addi $t1, $zero, 164
+	addi $t1, $zero, 156
 	addi $t2, $zero, 256
 	lw $s7, row3Speed
 	beq $s0, $t3, CheckWaterRow
@@ -167,7 +167,7 @@ CheckForCollision:
 	# check if the frog is on the fourth row
 	lw $t3, row4Y  # load the y value of the row
 	lw $t0, row4X  # load the X value of the row
-	addi $t1, $zero, 100
+	addi $t1, $zero, 96
 	addi $t2, $zero, 168
 	lw $s7, row4Speed
 	beq $s0, $t3, CheckWaterRow
@@ -175,7 +175,7 @@ CheckForCollision:
 	# check if the frog is on the fifth row
 	lw $t3, row5Y  # load the y value of the row
 	lw $t0, row5X  # load the X value of the row
-	addi $t1, $zero, 100
+	addi $t1, $zero, 96
 	addi $t2, $zero, 168
 	lw $s7, row5Speed
 	beq $s0, $t3, CheckWaterRow
