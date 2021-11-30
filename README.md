@@ -1,2 +1,2 @@
 # csc258-frogger
-Final project for cssc258
+Final project for csc258
