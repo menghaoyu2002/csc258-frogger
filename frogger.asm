@@ -17,7 +17,8 @@
 # 3. Display the number of lives remaining. - easy
 # 4. After final player death, display gameover/retry screen. Restart the game if the retry option is chosen. - easy
 # 5. Have objects in different rows move at different speeds. - easy
-# 6. Display the player's score at the top of the screen. - hard
+# 6. Have Frog face the direction it's moving - easy
+# 7. Display the player's score at the top of the screen. - hard
 #######################################################################
 
 .data
@@ -25,7 +26,7 @@
 	
 	# the position of the frog, represents the top left corner of the frog
 	frogX: .word 256
-	frogY: .word 288
+	frogY: .word 32
 	
 	# positions
 	spawnPos: .word 61440
@@ -46,7 +47,7 @@
 	
 	row4X: .word 0
 	row4Y: .word 28672
-	row4Speed: .word -16
+	row4Speed: .word -4
 	
 	row5X: .word 0
 	row5Y: .word 32768
@@ -75,6 +76,10 @@
 	
 	# number of lives
 	numberOfLives: .byte 3
+	
+	# score
+	score: .word 0
+	goalFrogs: .word 0:5
 	
 	# sprites
 	# spawn + safezones
@@ -130,15 +135,21 @@ MainGameLoop:
 	
 	# Draw the game
 	jal DrawGame
+	
 	jal Sleep
 	
 	j MainGameLoop  # restart game loop
+CheckPlayAgain:
 EndGame:
 	j Exit
 	
 CheckForCollision:
 	lw $s0, frogY  # load the current Y position of the frog
 	mul $s0, $s0, 128  # translate the Y position into pixels
+	
+	# check if the frog is in the goal region
+	addi $t3, $zero, 12288
+	beq $s0, $t3, CheckGoalRow
 	
 	# check if the frog is on the first row
 	lw $t3, row1Y  # load the y value of the row
@@ -216,6 +227,60 @@ CheckForCollision:
 	beq $s0, $t3, CheckRoadRow
 FinishedCollisionCheck:
 	jr $ra
+CheckGoalRow:
+	add $s1, $zero, $zero  # number of loop iterations
+	addi $s2, $zero, 32  # position to start drawing from
+	# save the current $ra
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+CheckGoalLoop:
+	beq $s1, 5, EndGoalLoop  # if we've looped through all the goals spaces
+	# pass the location of the sprite
+	addi $sp, $sp, -4
+	sw $s2, 0($sp)
+	
+	# pass the hazardous width of the sprite
+	addi $t1, $zero, 48
+	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	
+	# pass the full width of the sprite
+	addi $t2, $zero, 512
+	addi $sp, $sp, -4
+	sw $t2, 0($sp)
+	
+	jal HasOverlap  # check if there is an overlap
+	
+	lb $v0, 0($sp)  # load the return value, 0 is no overlap, 1 is has overlap
+	addi $sp, $sp, 4
+	
+	beq $v0, 1, FrogInGoal
+	addi $s1, $s1, 1  # decrement the loop counter by 1
+	addi $s2, $s2, 100  # increment to the next start position
+	j CheckGoalLoop
+FrogInGoal:
+	# set the frog in that goal spot
+	addi $t0, $zero, 1
+	la $t1, goalFrogs 
+	mul $s1, $s1, 4  # get the address offset
+	add $t1, $t1, $s1  # increment the address by the offset
+	sw $t0, 0($t1)
+EndGoalLoop:
+	# set the player to the starting point 
+	addi $t0, $zero, 256
+	sw $t0, frogX
+	addi $t0, $zero, 480
+	sw $t0, frogY
+	
+	# increment the users score by 50
+	lw $t0, score
+	addi $t0, $t0, 50  
+	sw $t0, score
+	
+	lw $ra, 0($sp)  # restore the return address
+	addi $sp, $sp, 4
+	
+	j FinishedCollisionCheck
 CheckWaterRow:
 	# save the current $ra
 	addi $sp, $sp, -4
@@ -632,13 +697,53 @@ DrawGame:
 	sw $t0, 0($sp)
 	jal DrawCar
 	
+	# pass the x and y parameters into the draw frog function
+	lw $t0, frogY
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	
+	lw $t0, frogX
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	jal DrawFrog
+	
+	jal DrawGoalFrogs
 	
 	lw $ra, 0($sp)  # load the current return address
 	jr $ra
 	
+DrawGoalFrogs:
+	# save the current ra
+	addi $sp, $sp -4
+	sw $ra, 0($sp)
 	
+	addi $s0, $zero, 40  # the starting goal spot 
+	la $s1, goalFrogs  # load the array of goal frogs
+DrawGoalFrogsLoop:
+	beq $s0, 540, EndGoalFrogsLoop
+	lw $t0, 0($s1)
+	beq $t0, 0, GoToNextGoalFrogsLoop  # if there is not supposed to be a frog, don't draw it
+	# pass the y value
+	addi $t0, $zero, 96
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	
+	#pass the x value
+	addi $sp, $sp, -4
+	sw $s0, 0($sp)
+	
+	jal DrawFrog
+GoToNextGoalFrogsLoop:
+	addi $s0, $s0, 100
+	addi $s1, $s1, 4
+	j DrawGoalFrogsLoop
+EndGoalFrogsLoop:
+	#load the saved ra
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	
+	jr $ra
+
 DrawTruck:
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)  # store the current $ra value overriting the sprite data
@@ -947,11 +1052,15 @@ StopDrawingSprite:
 DrawFrog:
 	la $t0, 0($gp)  # $t0 stores the base address for display
 	lw $a0, currentFrog # store the current frog sprite in $a0
-	lhu $t5, frogX  # load the x position of the frog
-	lhu $t6, frogY  # load the y position of the frog
-	mul $t6, $t6, 128  # multiply y with 128 to get the number of rows in pixels
-	add $t5, $t5, $t6 # add $t5 and $t6 together to get the position in total pixels (rows + shift right)
-	add $t1, $t0, $t5 # the place to start drawing from
+	
+	lw $a1, 0($sp)  # load the x position of the frog
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)  # load the y position of the frog
+	addi $sp, $sp, 4
+	
+	mul $a2, $a2, 128  # multiply y with 128 to get the number of rows in pixels
+	add $a1, $a1, $a2 # add $t5 and $t6 together to get the position in total pixels (rows + shift right)
+	add $t1, $t0, $a1 # the place to start drawing from
 	addi $t2, $t1, 4096  # set $t2 as the end position
 	addi $t1, $t1, -512 # decrement to get correct starting positing (because we increment at start of loop)
 FrogColumns:
@@ -1041,7 +1150,7 @@ ExitDrawGoalRegionLoop:
 	
 Sleep:
 	li $v0, 32
-	li $a0, 32  # sleep by 1/60 of a second
+	li $a0, 16  # sleep by 1/60 of a second
 	syscall
 	jr $ra
 				
