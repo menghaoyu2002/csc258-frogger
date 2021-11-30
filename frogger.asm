@@ -79,7 +79,7 @@
 	
 	# score
 	score: .word 0
-	goalFrogs: .word 0:5
+	goalFrogs: .word 1:5
 	
 	# sprites
 	# spawn + safezones
@@ -120,6 +120,8 @@ MainGame:
 	# give the player three lives on game start
 	addi $t0, $zero, 3
 	sb $t0, numberOfLives
+	
+	jal ResetGoalFrogs
 MainGameLoop:
 	lbu $t0, numberOfLives  # load the value for run game 
 	beq $t0, 0, EndGame  # if numberOfLives is zero, end the game, otherwise continue running
@@ -269,7 +271,7 @@ EndGoalLoop:
 	# set the player to the starting point 
 	addi $t0, $zero, 256
 	sw $t0, frogX
-	addi $t0, $zero, 480
+	addi $t0, $zero, 32
 	sw $t0, frogY
 	
 	# increment the users score by 50
@@ -1147,7 +1149,20 @@ DrawGoalRegionLoop:
 ExitDrawGoalRegionLoop:
 	jr $ra
 	
-	
+
+ResetGoalFrogs:
+	add $t0, $zero, $zero  # loop iteration
+	la $t1, goalFrogs  # load the address of the goal frogs
+ResetGoalFrogsLoop:
+	beq $t0, 5, EndResetGoalFrogs
+	sw $zero, 0($t1)
+	addi $t1, $t1, 4
+	addi $t0, $t0, 1
+	j ResetGoalFrogsLoop
+EndResetGoalFrogs:
+	jr $ra
+
+
 Sleep:
 	li $v0, 32
 	li $a0, 16  # sleep by 1/60 of a second
