@@ -26,7 +26,7 @@
 	
 	# the position of the frog, represents the top left corner of the frog
 	frogX: .word 256
-	frogY: .word 32
+	frogY: .word 480
 	
 	# positions
 	spawnPos: .word 61440
@@ -79,7 +79,7 @@
 	
 	# score
 	score: .word 0
-	goalFrogs: .word 1:5
+	goalFrogs: .word 0:5
 	
 	# sprites
 	# spawn + safezones
@@ -271,7 +271,7 @@ EndGoalLoop:
 	# set the player to the starting point 
 	addi $t0, $zero, 256
 	sw $t0, frogX
-	addi $t0, $zero, 32
+	addi $t0, $zero, 480
 	sw $t0, frogY
 	
 	# increment the users score by 50
@@ -707,6 +707,10 @@ DrawGame:
 	lw $t0, frogX
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	
+	lw $t0, currentFrog  # pass the frog sprite in
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	jal DrawFrog
 	
 	jal DrawGoalFrogs
@@ -734,6 +738,9 @@ DrawGoalFrogsLoop:
 	addi $sp, $sp, -4
 	sw $s0, 0($sp)
 	
+	la $t2, frogUp
+	addi $sp, $sp, -4
+	sw $t2, 0($sp)
 	jal DrawFrog
 GoToNextGoalFrogsLoop:
 	addi $s0, $s0, 100
@@ -1053,8 +1060,8 @@ StopDrawingSprite:
 
 DrawFrog:
 	la $t0, 0($gp)  # $t0 stores the base address for display
-	lw $a0, currentFrog # store the current frog sprite in $a0
-	
+	lw $a0, 0($sp) # store the current frog sprite in $a0
+	addi $sp, $sp, 4
 	lw $a1, 0($sp)  # load the x position of the frog
 	addi $sp, $sp, 4
 	lw $a2, 0($sp)  # load the y position of the frog
