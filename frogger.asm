@@ -1,7 +1,7 @@
 ######################################################################
 # CSC258H5S Fall 2021 Assembly Final Project
 # University of Toronto, St. George
-## Student: Name, Student Number
+## Student: Menghao Yu, 1006940474
 ## Bitmap Display Configuration:
 # - Unit width in pixels: 4
 # - Unit height in pixels: 4
@@ -9,16 +9,14 @@
 # - Display height in pixels: 512
 # - Base Address for Display: 0x10008000 ($gp)
 ## Which milestone is reached in this submission?
-# - Milestone 3 (choose the one the applies)
+# - Milestone 4 (choose the one the applies)
 ## Which approved additional features have been implemented?
 # (See the assignment handout for the list of additional features)
 # 1. Add a third row in each of the water and road sections - easy
 # 2. Make objects (frog, logs, turtles, vehicles,etc) look more like the arcade version. -easy
-# 3. Display the number of lives remaining. - easy
-# 4. After final player death, display gameover/retry screen. Restart the game if the retry option is chosen. - easy
-# 5. Have objects in different rows move at different speeds. - easy
-# 6. Have Frog face the direction it's moving - easy
-# 7. Display the player's score at the top of the screen. - hard
+# 3. After final player death, display gameover/retry screen. Restart the game if the retry option is chosen. - easy
+# 4. Have objects in different rows move at different speeds. - easy
+# 5. Have Frog face the direction it's moving - easy
 #######################################################################
 
 .data
@@ -136,7 +134,7 @@ MainGameLoop:
 	jal CheckForCollision
 	
 	# update the positions of the objects on the screen 
-	jal UpdatePositions
+	#jal UpdatePositions
 	
 	# Draw the game
 	jal DrawGame
