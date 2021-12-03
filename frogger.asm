@@ -9,7 +9,7 @@
 # - Display height in pixels: 512
 # - Base Address for Display: 0x10008000 ($gp)
 ## Which milestone is reached in this submission?
-# - Milestone 4 (choose the one the applies)
+# - Milestone 5
 ## Which approved additional features have been implemented?
 # (See the assignment handout for the list of additional features)
 # 1. Add a third row in each of the water and road sections - easy
