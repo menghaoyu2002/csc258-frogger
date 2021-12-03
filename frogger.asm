@@ -17,6 +17,8 @@
 # 3. After final player death, display gameover/retry screen. Restart the game if the retry option is chosen. - easy
 # 4. Have objects in different rows move at different speeds. - easy
 # 5. Have Frog face the direction it's moving - easy
+# 6. Dispay the number of lives remaining - easy
+# 7. Display the player's score at the top of the screen - hard.
 #######################################################################
 
 .data
